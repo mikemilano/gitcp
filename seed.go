@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/whilp/git-urls"
 	"golang.org/x/crypto/ssh"
@@ -16,22 +15,14 @@ import (
 )
 
 type Seed struct {
+	config Config
 	url  *url.URL
 	path string
 }
 
-func NewSeed(parts ...string) (Seed, error) {
-	if len(parts) == 0 {
-		return Seed{}, errors.New("seed: seed created with no input")
-	}
-	str := parts[0]
+func NewSeed(config Config, target string) (Seed, error) {
 
-	path := ""
-	if len(parts) > 1 {
-		path = parts[1]
-	}
-
-	gitUrl, err := giturls.Parse(str)
+	gitUrl, err := giturls.Parse(target)
 	if err != nil {
 		return Seed{}, err
 	}
@@ -40,11 +31,11 @@ func NewSeed(parts ...string) (Seed, error) {
 
 	if filePath.MatchString(gitUrl.String()) {
 		// TODO: Determine when to set http or ssh format
-		gitUrl, _ = giturls.Parse("git@github.com:" + str)
-		return Seed{url: gitUrl, path: path}, nil
+		gitUrl, _ = giturls.Parse("git@github.com:" + target)
+		return Seed{config: config, url: gitUrl}, nil
 	}
 
-	return Seed{url: gitUrl, path: path}, nil
+	return Seed{config: config, url: gitUrl}, nil
 }
 
 func (s *Seed) clone() {
