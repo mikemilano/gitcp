@@ -11,16 +11,26 @@ import (
 	"net/url"
 	"os"
 	"os/user"
+	"path/filepath"
 	"regexp"
 )
 
 type Seed struct {
 	config Config
-	url  *url.URL
-	path string
+	url    *url.URL
 }
 
-func NewSeed(config Config, target string) (Seed, error) {
+func NewSeed(ci ConfigInput, target string) (Seed, error) {
+
+	// TODO: Handle auto
+	if ci.proto == "auto" {
+		ci.proto = "ssh"
+	}
+
+	config, err := NewConfig(ci)
+	if err != nil {
+		return Seed{}, err
+	}
 
 	gitUrl, err := giturls.Parse(target)
 	if err != nil {
@@ -30,32 +40,54 @@ func NewSeed(config Config, target string) (Seed, error) {
 	filePath := regexp.MustCompile(`^file://@[a-z0-9-]{0,38}/`)
 
 	if filePath.MatchString(gitUrl.String()) {
-		// TODO: Determine when to set http or ssh format
-		gitUrl, _ = giturls.Parse("git@github.com:" + target)
+		// TODO: Refactor the way url is set
+		url := "https://github.com/" + target + ".git"
+		if config.proto == "ssh" {
+			url = "git@github.com:" + target
+		}
+		gitUrl, _ = giturls.Parse(url)
+
+		fmt.Println(gitUrl)
 		return Seed{config: config, url: gitUrl}, nil
 	}
 
 	return Seed{config: config, url: gitUrl}, nil
 }
 
-func (s *Seed) clone() {
-	//Info("git clone https://github.com/src-d/go-git")
+func (s *Seed) clone() error {
+	// remove directory if exists
+	path := filepath.Join(s.config.cdir, "seeder")
+	err := os.RemoveAll(path)
+	if err != nil {
+		return err
+	}
+	// create directory
+	err = os.Mkdir(path, os.ModePerm)
+	if err != nil {
+		return err
+	}
 
-	usr, err := user.Current()
+	opts := &git.CloneOptions{
+		URL: s.url.String(),
+	}
 
-	// TODO: Optionally add auth if endpoint is ssh
+	// TODO: Refactor to use argument for private key
+	if s.config.proto == "ssh" {
+		usr, _ := user.Current()
+		opts.Auth = get_ssh_key_auth(usr.HomeDir + "/.ssh/id_rsa")
+	}
+	// TODO: Fix so it works
+	if s.config.quiet == false {
+		opts.Progress = os.Stdout
+	}
 
-	_, err = git.PlainClone("/tmp/foo", false, &git.CloneOptions{
-		URL:      s.url.String(),
-		Auth: get_ssh_key_auth(usr.HomeDir + "/.ssh/id_rsa"),
-		Progress: os.Stdout,
-	})
+	_, err = git.PlainClone(path, false, opts)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	//CheckIfError(err)
+	return nil
 }
 
 func get_ssh_key_auth(privateSshKeyFile string) transport.AuthMethod {

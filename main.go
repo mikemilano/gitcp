@@ -31,6 +31,7 @@ func main() {
 			Name:     "clone-cdir, c",
 			Usage:    "temp directory where repo will be cloned; \"memory\" to use system memory;",
 			FilePath: "/tmp",
+			Value: "/tmp",
 		},
 		cli.StringFlag{
 			Name:  "github-proto, p",
@@ -63,7 +64,7 @@ func main() {
 			ci.dst = c.String("dst")
 		}
 		if c.String("clone-cdir") != "" {
-			ci.src = c.String("clone-cdir")
+			ci.cdir = c.String("clone-cdir")
 		}
 		if c.String("github-proto") != "" {
 			ci.proto = c.String("github-proto")
@@ -71,23 +72,15 @@ func main() {
 		ci.quiet = c.Bool("verbose")
 		ci.verbose = c.Bool("verbose")
 
-		fmt.Printf("%+v\n", ci)
-		return nil
-
-		fmt.Println(c.String("src"))
-		return nil
-
 		s, err := NewSeed(ci, target)
 
 		if err != nil {
 			println("Unable to retrieve seed")
+			println(err.Error())
 		}
 
-		if s == (Seed{}) {
-			return cli.NewExitError("repo string is invalid or inaccessible", 1)
-		}
-
-		s.clone()
+		err = s.clone()
+		fmt.Println(err)
 
 		return nil
 	}

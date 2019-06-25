@@ -51,10 +51,10 @@ func NewConfig(ci ConfigInput) (Config, error) {
 
 	// validate clone directory
 	if ci.cdir == "" {
-		return Config{}, errors.New("config: cdir must not be empty")
+		return Config{}, errors.New("config: cdir value must not be empty")
 	}
 	if _, err := os.Stat(ci.cdir); os.IsNotExist(err) {
-		return Config{}, errors.New("config: cdir must not be empty")
+		return Config{}, errors.New("config: cdir must be a valid path")
 	}
 
 	// validate proto is auto, https, or ssh
@@ -67,6 +67,7 @@ func NewConfig(ci ConfigInput) (Config, error) {
 	return Config{
 		src:   src,
 		dst:   dst,
+		cdir: ci.cdir,
 		proto: ci.proto,
 	}, nil
 }
