@@ -5,6 +5,7 @@ import (
 	"github.com/urfave/cli"
 	"log"
 	"os"
+	"os/user"
 )
 
 func main() {
@@ -13,8 +14,8 @@ func main() {
 	app.Usage = "copy source from remote repository"
 	app.Version = "0.0.1"
 
-	// TODO: Add option for ssh key
-	// TODO: Add option for github https vs ssh
+	usr, _ := user.Current()
+	key := usr.HomeDir + "/.ssh/id_rsa"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -29,9 +30,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:     "clone-cdir, c",
-			Usage:    "temp directory where repo will be cloned; \"memory\" to use system memory;",
+			Usage:    "temp directory where repo will be cloned; \"memory\" to use system memory",
 			FilePath: "/tmp",
-			Value: "/tmp",
+			Value:    "/tmp",
+		},
+		cli.StringFlag{
+			Name:  "ssh-key, k",
+			Usage: "private ssh key to use (default: \"" + key + "\")",
 		},
 		cli.StringFlag{
 			Name:  "github-proto, p",
@@ -53,9 +58,11 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		target := c.Args().Get(0)
+
 
 		ci := ConfigInput{}
+
+		ci.target = c.Args().Get(0)
 
 		if c.String("src") != "" {
 			ci.src = c.String("src")
@@ -66,13 +73,16 @@ func main() {
 		if c.String("clone-cdir") != "" {
 			ci.cdir = c.String("clone-cdir")
 		}
+		if c.String("ssh-key") != "" {
+			ci.key = c.String("ssh-key")
+		}
 		if c.String("github-proto") != "" {
 			ci.proto = c.String("github-proto")
 		}
-		ci.quiet = c.Bool("verbose")
+		ci.quiet = c.Bool("quiet")
 		ci.verbose = c.Bool("verbose")
 
-		s, err := NewSeed(ci, target)
+		s, err := NewSeed(ci)
 
 		if err != nil {
 			println("Unable to retrieve seed")

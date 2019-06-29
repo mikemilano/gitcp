@@ -2,14 +2,20 @@ package main
 
 import (
 	"errors"
+	giturls "github.com/whilp/git-urls"
+	"net/url"
 	"os"
+	"os/user"
+	"regexp"
 	"strings"
 )
 
 type ConfigInput struct {
 	src     string
 	dst     string
+	target  string
 	cdir    string
+	key     string
 	proto   string
 	quiet   bool
 	verbose bool
@@ -18,7 +24,9 @@ type ConfigInput struct {
 type Config struct {
 	src     []string
 	dst     []string
+	url     url.URL
 	cdir    string
+	key     string
 	proto   string
 	quiet   bool
 	verbose bool
@@ -64,10 +72,42 @@ func NewConfig(ci ConfigInput) (Config, error) {
 		return Config{}, errors.New("config: invalid proto")
 	}
 
+	// validate url directory
+	if ci.target == "" {
+		return Config{}, errors.New("config: url must not be empty")
+	}
+	// convert short target into url
+	gitUrl, err := giturls.Parse(ci.target)
+	if err != nil {
+		return Config{}, err
+	}
+
+	// convert short format to actual url
+	filePath := regexp.MustCompile(`^file://@[a-z0-9-]{0,38}/`)
+	if filePath.MatchString(gitUrl.String()) {
+		configURL := ""
+		if ci.proto == "ssh" || ci.proto == "auto" {
+			// TODO: Only set auto to ssh if the repo is private
+			ci.proto = "ssh"
+			configURL = "git@github.com:" + ci.target
+		} else {
+			configURL = "https://github.com/" + ci.target + ".git"
+		}
+		gitUrl, _ = giturls.Parse(configURL)
+	}
+
+	// validate ssh key exists if proto is ssh and repo is private
+	if ci.proto == "ssh" && ci.key == "" {
+		usr, _ := user.Current()
+		ci.key = usr.HomeDir + "/.ssh/id_rsa"
+	}
+
 	return Config{
+		url:   *gitUrl,
 		src:   src,
 		dst:   dst,
-		cdir: ci.cdir,
+		cdir:  ci.cdir,
+		key:   ci.key,
 		proto: ci.proto,
 	}, nil
 }
