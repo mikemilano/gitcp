@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -63,13 +62,15 @@ func main() {
 		ci := ConfigInput{}
 
 		ci.target = c.Args().Get(0)
+		ci.src = c.Args().Get(1)
+		ci.dst = c.Args().Get(2)
 
-		if c.String("src") != "" {
-			ci.src = c.String("src")
-		}
-		if c.String("dst") != "" {
-			ci.dst = c.String("dst")
-		}
+		//if c.String("src") != "" {
+		//	ci.src = c.String("src")
+		//}
+		//if c.String("dst") != "" {
+		//	ci.dst = c.String("dst")
+		//}
 		if c.String("clone-cdir") != "" {
 			ci.cdir = c.String("clone-cdir")
 		}
@@ -82,6 +83,8 @@ func main() {
 		ci.quiet = c.Bool("quiet")
 		ci.verbose = c.Bool("verbose")
 
+		// fmt.Printf("%+v", ci)
+
 		s, err := NewSeed(ci)
 
 		if err != nil {
@@ -89,8 +92,17 @@ func main() {
 			println(err.Error())
 		}
 
-		err = s.clone()
-		fmt.Println(err)
+		//err = s.clone()
+		//if err != nil {
+		//	println("Unable to clone project")
+		//	println(err.Error())
+		//}
+
+		err = s.process()
+		if err != nil {
+			println("Unable to copy files")
+			println(err.Error())
+		}
 
 		return nil
 	}

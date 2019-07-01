@@ -37,25 +37,10 @@ func NewConfig(ci ConfigInput) (Config, error) {
 	if ci.src == "" {
 		return Config{}, errors.New("config: src must not be empty")
 	}
-	if ci.dst == "" {
-		return Config{}, errors.New("config: dst must not be empty")
-	}
 
 	// parse src & dst strings into slices
 	src := strings.Split(ci.src, ",")
 	dst := strings.Split(ci.dst, ",")
-
-	// validate src length must match dst length if dst length is greater than 1
-	srcLen := len(src)
-	dstLen := len(dst)
-	if srcLen > 1 && srcLen != dstLen && dstLen != 1 {
-		return Config{}, errors.New("config: dst count must be 1, or match src count")
-	}
-	for _, x := range dst {
-		if _, err := os.Stat(x); os.IsNotExist(err) {
-			return Config{}, errors.New("config: destinations must be valid paths")
-		}
-	}
 
 	// validate clone directory
 	if ci.cdir == "" {
