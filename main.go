@@ -28,6 +28,10 @@ func main() {
 			Value: "./",
 		},
 		cli.StringFlag{
+			Name:  "branch, b",
+			Usage: "Git branch",
+		},
+		cli.StringFlag{
 			Name:     "clone-cdir, c",
 			Usage:    "temp directory where repo will be cloned; \"memory\" to use system memory",
 			FilePath: "/tmp",
@@ -58,19 +62,12 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 
-
 		ci := ConfigInput{}
 
 		ci.target = c.Args().Get(0)
 		ci.src = c.Args().Get(1)
 		ci.dst = c.Args().Get(2)
 
-		//if c.String("src") != "" {
-		//	ci.src = c.String("src")
-		//}
-		//if c.String("dst") != "" {
-		//	ci.dst = c.String("dst")
-		//}
 		if c.String("clone-cdir") != "" {
 			ci.cdir = c.String("clone-cdir")
 		}
@@ -92,11 +89,11 @@ func main() {
 			println(err.Error())
 		}
 
-		//err = s.clone()
-		//if err != nil {
-		//	println("Unable to clone project")
-		//	println(err.Error())
-		//}
+		err = s.clone()
+		if err != nil {
+			println("Unable to clone project")
+			println(err.Error())
+		}
 
 		err = s.process()
 		if err != nil {

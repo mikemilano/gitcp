@@ -5,9 +5,9 @@ import (
 	"github.com/otiai10/copy"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	go_git_ssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
-	//"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -27,8 +27,8 @@ func NewSeed(ci ConfigInput) (Seed, error) {
 }
 
 func (s *Seed) clone() error {
-	// TODO: support branches
 	// TODO: pull & branch (no clone) if the cached repo is the same
+	// TODO: remove .gitignore (may conflict with caching repo)
 
 	// remove directory if exists
 	path := filepath.Join(s.config.cdir, "seeder")
@@ -48,6 +48,11 @@ func (s *Seed) clone() error {
 
 	if s.config.proto == "ssh" && s.config.key != "" {
 		opts.Auth = GetSSHKeyAuth(s.config.key)
+	}
+	// set branch if defined
+	if s.config.branch != "" {
+		opts.ReferenceName = plumbing.ReferenceName(s.config.branch)
+		opts.SingleBranch = true
 	}
 	// TODO: Fix so it works
 	if s.config.quiet == false {
@@ -93,6 +98,9 @@ func (s Seed) process() error {
 			if s.config.dst[i] != "" {
 				matchDstAbs = filepath.Join(dstDirAbs, s.config.dst[i], matchSrcBase)
 			}
+
+			// TODO: detect if custom destinations have a file extension, if not, use that as the dst directory
+
 			// determine what the destination directory is
 			matchDstDir := matchDstAbs
 			if !matchSrcInfo.IsDir() {

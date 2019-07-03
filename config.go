@@ -14,6 +14,7 @@ type ConfigInput struct {
 	src     string
 	dst     string
 	target  string
+	branch  string
 	cdir    string
 	key     string
 	proto   string
@@ -25,6 +26,7 @@ type Config struct {
 	src     []string
 	dst     []string
 	url     url.URL
+	branch  string
 	cdir    string
 	key     string
 	proto   string
@@ -88,11 +90,12 @@ func NewConfig(ci ConfigInput) (Config, error) {
 	}
 
 	return Config{
-		url:   *gitUrl,
-		src:   src,
-		dst:   dst,
-		cdir:  ci.cdir,
-		key:   ci.key,
-		proto: ci.proto,
+		url:    *gitUrl,
+		src:    src,
+		dst:    dst,
+		branch: ci.branch,
+		cdir:   ci.cdir,
+		key:    ci.key,
+		proto:  ci.proto,
 	}, nil
 }
