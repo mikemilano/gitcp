@@ -1,10 +1,12 @@
 Seeder: A Project Utility & Build Tool
 ======================================
 
-Instead of cloning, copying, and cleaning up, use `seeder`!
+Instead of cloning, copying, and cleaning, use `seeder`!
 
-Seeder is a CLI utility for retrieving parts or entire repositories into your current project, or just subdirectories. 
-It works with both public and private repositories via either a short path from Github or a full clone URL.
+> This is as much for users fetching remote files from repos as it is to those maintaining seeds!
+
+Seeder is a CLI utility for retrieving parts or entire repositories into your current project. 
+It works with both public and private repositories via a short path for Github or a full git URL to any repo.
 
 Seeder not only handles fetching code, but it also takes care of the mapping of code from an external path into the
 current project. This makes it not only handy to create project, but to act as a build tool for projects which rely on 
@@ -35,13 +37,19 @@ Need to specify a destination?
 seeder example/some-web-project .htaccess public/.htaccess
 ```
 
-Or, maybe we need a couple files...
+I think I want to retrieve all the `User` components.
+```bash
+# If destination is not specified, it will use the same structure for each file.
+seeder example/my-vue-project components/User*
+```
+
+Or, maybe we need a couple files placed in different directories...
 ```bash
 # Copies .htaccess to public/.htaccess and .editorconfig to ./.editorconfig
 seeder example/my-old-web-project .htaccess,.editorconfig public/.htaccess,.editorconfig
 ```
 
-Or, glob it!
+More globbing!
 ```bash
 seeder example/foo src/**/*.c
 ```
@@ -70,11 +78,11 @@ seeder mikemilano/my-seed components
 seeder mikemilano/my-vuejs-project components/User.vue mycomponents/MyUser.vue
 
 # Copy multiple remote files
-seeder mikemilano/vuejs-components --src components/User.vue,components/Admin.vue
+seeder mikemilano/vuejs-components components/User.vue,components/Admin.vue
 
 # Copy multiple remote paths into multiple different local paths
-seeder mikemilano/vuejs-components --src components/User.vue,components/Admin.vue --dst components/Users,components/Admin
+seeder mikemilano/vuejs-components components/User.vue,components/Admin.vue components/Users,components/Admin
 
 # Combine the files in multiple remote directories into a single local path
-seeder mikemioano/vuejs-components --src components/User/*,components/Admin/* --dst components/
+seeder mikemioano/vuejs-components components/User/*,components/Admin/* components/
 ```
