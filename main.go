@@ -72,6 +72,9 @@ func main() {
 		ci.src = c.Args().Get(1)
 		ci.dst = c.Args().Get(2)
 
+		if c.String("branch") != "" {
+			ci.branch = c.String("branch")
+		}
 		if c.String("clone-cdir") != "" {
 			ci.cdir = c.String("clone-cdir")
 		}
