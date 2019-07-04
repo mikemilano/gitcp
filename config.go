@@ -18,6 +18,7 @@ type ConfigInput struct {
 	cdir    string
 	key     string
 	proto   string
+	git     bool
 	quiet   bool
 	verbose bool
 }
@@ -30,6 +31,7 @@ type Config struct {
 	cdir    string
 	key     string
 	proto   string
+	git     bool
 	quiet   bool
 	verbose bool
 }
@@ -37,7 +39,7 @@ type Config struct {
 func NewConfig(ci ConfigInput) (Config, error) {
 	// validate src & dst must not be empty
 	if ci.src == "" {
-		return Config{}, errors.New("config: src must not be empty")
+		ci.src = "."
 	}
 
 	// parse src & dst strings into slices
@@ -90,12 +92,15 @@ func NewConfig(ci ConfigInput) (Config, error) {
 	}
 
 	return Config{
-		url:    *gitUrl,
-		src:    src,
-		dst:    dst,
-		branch: ci.branch,
-		cdir:   ci.cdir,
-		key:    ci.key,
-		proto:  ci.proto,
+		url:     *gitUrl,
+		src:     src,
+		dst:     dst,
+		branch:  ci.branch,
+		cdir:    ci.cdir,
+		key:     ci.key,
+		proto:   ci.proto,
+		git:     ci.git,
+		quiet:   ci.quiet,
+		verbose: ci.verbose,
 	}, nil
 }

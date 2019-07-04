@@ -5,6 +5,7 @@ import (
 	"github.com/otiai10/copy"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	go_git_ssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
@@ -28,7 +29,6 @@ func NewSeed(ci ConfigInput) (Seed, error) {
 
 func (s *Seed) clone() error {
 	// TODO: pull & branch (no clone) if the cached repo is the same
-	// TODO: remove .gitignore (may conflict with caching repo)
 
 	// remove directory if exists
 	path := filepath.Join(s.config.cdir, "seeder")
@@ -50,16 +50,42 @@ func (s *Seed) clone() error {
 		opts.Auth = GetSSHKeyAuth(s.config.key)
 	}
 	// set branch if defined
-	if s.config.branch != "" {
-		opts.ReferenceName = plumbing.ReferenceName(s.config.branch)
-		opts.SingleBranch = true
-	}
-	// TODO: Fix so it works
+	//if s.config.branch != "" {
+	//	opts.ReferenceName = plumbing.ReferenceName(s.config.branch)
+	//	opts.SingleBranch = true
+	//}
 	if s.config.quiet == false {
 		opts.Progress = os.Stdout
 	}
 
-	_, err = git.PlainClone(path, false, opts)
+	// clone repo
+	r, err := git.PlainClone(path, false, opts)
+	// handle branching
+	if r != nil && s.config.branch != "" {
+		w, _ := r.Worktree()
+
+		err := r.Fetch(&git.FetchOptions{
+			RefSpecs: []config.RefSpec{"refs/*:refs/*", "HEAD:refs/heads/HEAD"},
+		})
+		if err != nil {
+			return err
+		}
+
+		err = w.Checkout(&git.CheckoutOptions{
+			Branch: plumbing.NewBranchReferenceName(s.config.branch),
+			//Branch: fmt.Sprintf("refs/heads/%s", s.config.branch),
+			Force:  true,
+		})
+	}
+
+
+	// Remove .git
+	if !s.config.git {
+		err = os.RemoveAll(filepath.Join(path, ".git"))
+		if err != nil {
+			return err
+		}
+	}
 
 	if err != nil {
 		fmt.Println(err)
@@ -82,8 +108,6 @@ func (s Seed) process() error {
 		if len(matches) == 0 {
 			continue
 		}
-
-		fmt.Printf("%+v\n", matches)
 
 		for _, matchSrcAbs := range matches {
 			// stat info of the match

@@ -47,6 +47,10 @@ func main() {
 			Value: "auto",
 		},
 		cli.BoolFlag{
+			Name:  "preserve-git, g",
+			Usage: "preserve .git directory",
+		},
+		cli.BoolFlag{
 			Name:  "quiet, q",
 			Usage: "quiet mode, no output",
 		},
@@ -77,6 +81,7 @@ func main() {
 		if c.String("github-proto") != "" {
 			ci.proto = c.String("github-proto")
 		}
+		ci.git = c.Bool("preserve-git")
 		ci.quiet = c.Bool("quiet")
 		ci.verbose = c.Bool("verbose")
 
