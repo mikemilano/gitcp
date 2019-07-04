@@ -3,7 +3,7 @@ Seeder: A Project Utility & Build Tool
 
 Instead of cloning, copying, and cleaning, use `seeder`!
 
-> This is as much for users fetching files as it is for those maintaining seeds!
+> This is as much for users fetching files as it is for those maintaining seeds. It could be useful in a CI pipeline as well!
 
 Seeder is a CLI utility for retrieving parts or entire repositories into your current project. 
 It works with both public and private repositories via a short path for Github or a full git URL to any repo.
