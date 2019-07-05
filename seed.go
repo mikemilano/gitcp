@@ -83,10 +83,10 @@ func (s Seed) process() error {
 		matches, _ := filepath.Glob(srcGlob)
 
 		// TODO: Error that source did not match any files?
-		if len(matches) == 0 {
+		matchCount := len(matches)
+		if matchCount == 0 {
 			continue
 		}
-
 		for _, matchSrcAbs := range matches {
 			// stat info of the match
 			matchSrcInfo, _ := os.Stat(matchSrcAbs)
@@ -97,11 +97,17 @@ func (s Seed) process() error {
 			// default destination uses the path as it is in the source project
 			matchDstAbs := filepath.Join(dstDirAbs, matchSrcRel)
 			// custom destination if specified
-			if s.config.dst[i] != "" {
-				matchDstAbs = filepath.Join(dstDirAbs, s.config.dst[i], matchSrcBase)
+			dstPath := s.config.dst[i]
+			if dstPath != "" {
+				// Set as if a destination file path was given (not a directory)
+				matchDstAbs = filepath.Join(dstDirAbs, s.config.dst[i])
+				// Determine if the user is specifying a directory by the lack of an extension
+				matchDstExt := filepath.Ext(matchDstAbs)
+				if matchDstExt == "" {
+					// Use the original filename as the destination file
+					matchDstAbs = filepath.Join(matchDstAbs, matchSrcBase)
+				}
 			}
-
-			// TODO: detect if custom destinations have a file extension, if not, use that as the dst directory
 
 			// determine what the destination directory is
 			matchDstDir := matchDstAbs
