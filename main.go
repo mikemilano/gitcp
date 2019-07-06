@@ -14,7 +14,7 @@ func main() {
 	app.Version = "0.0.1"
 
 	usr, _ := user.Current()
-	key := usr.HomeDir + "/.ssh/id_rsa"
+	defaultKey := usr.HomeDir + "/.ssh/id_rsa"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -39,7 +39,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:  "ssh-key, k",
-			Usage: "private ssh key to use (default: \"" + key + "\")",
+			Usage: "private ssh key to use (default: \"" + defaultKey + "\")",
 		},
 		cli.StringFlag{
 			Name:  "github-proto, p",
@@ -65,33 +65,19 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-
 		ci := ConfigInput{}
-
 		ci.target = c.Args().Get(0)
 		ci.src = c.Args().Get(1)
 		ci.dst = c.Args().Get(2)
-
-		if c.String("branch") != "" {
-			ci.branch = c.String("branch")
-		}
-		if c.String("clone-cdir") != "" {
-			ci.cdir = c.String("clone-cdir")
-		}
-		if c.String("ssh-key") != "" {
-			ci.key = c.String("ssh-key")
-		}
-		if c.String("github-proto") != "" {
-			ci.proto = c.String("github-proto")
-		}
+		ci.branch = c.String("branch")
+		ci.cdir = c.String("clone-cdir")
+		ci.key = c.String("ssh-key")
+		ci.proto = c.String("github-proto")
 		ci.git = c.Bool("preserve-git")
 		ci.quiet = c.Bool("quiet")
 		ci.verbose = c.Bool("verbose")
 
-		// fmt.Printf("%+v", ci)
-
 		s, err := NewSeed(ci)
-
 		if err != nil {
 			println("Unable to retrieve seed")
 			println(err.Error())
