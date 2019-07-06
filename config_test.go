@@ -5,95 +5,28 @@ import (
 )
 
 func TestNewConfigSrcDstValues(t *testing.T) {
-	// expect error for missing src
+	// expect no error for default paths
 	ci := ConfigInput{
 		target: "https://github.com/mikemilano/seeder.git",
-		dst:   "./",
 		cdir: "/tmp",
 		proto: "auto",
 	}
 	_, err := NewConfig(ci)
-	if err == nil {
-		t.Error("Expected empty src error, got none")
-	}
-
-	// expect error for missing dst
-	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
-		src:   "./",
-		cdir: "/tmp",
-		proto: "auto",
-	}
-	_, err = NewConfig(ci)
-	if err == nil {
-		t.Error("Expected empty dst error, got none")
+	if err != nil {
+		t.Error("Expected no errors with empty src/dst, got error")
 	}
 
 	// expect no error for default paths
 	ci = ConfigInput{
 		target: "https://github.com/mikemilano/seeder.git",
-		src:   "./",
-		dst:   "./",
+		src:   "README.md",
+		dst:   ".",
 		cdir: "/tmp",
 		proto: "auto",
 	}
 	_, err = NewConfig(ci)
 	if err != nil {
 		t.Error("Expected no errors with default src/dst, got error")
-	}
-}
-
-func TestNewConfigSrcDstLengths(t *testing.T) {
-	// expect error for differing path counts where dst is not 1
-	ci := ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
-		src:   "path/1,path/2",
-		dst:   "path/1,path/2,path/3",
-		cdir: "/tmp",
-		proto: "auto",
-	}
-	_, err := NewConfig(ci)
-	if err == nil {
-		t.Error("Expected src/dst length error, got none")
-	}
-
-	// expect no error when both paths have an equal count
-	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
-		src:   "./,./",
-		dst:   "./,./",
-		cdir: "/tmp",
-		proto: "auto",
-	}
-	_, err = NewConfig(ci)
-	if err != nil {
-		t.Error("Expected src/dst length to pass with equal lengths, got error")
-	}
-
-	// expect error when destination does not exist
-	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
-		src:   "./",
-		dst:   "/invalid-dst",
-		cdir: "/tmp",
-		proto: "auto",
-	}
-	_, err = NewConfig(ci)
-	if err == nil {
-		t.Error("Expected error for invalid dst, got none")
-	}
-
-	// expect no error when src has multiple paths, and dst has 1
-	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
-		src:   "./,./",
-		dst:   "./",
-		cdir: "/tmp",
-		proto: "auto",
-	}
-	_, err = NewConfig(ci)
-	if err != nil {
-		t.Error("Expected multi src single dst to pass, got error")
 	}
 }
 
@@ -196,7 +129,7 @@ func TestCloneDir(t *testing.T) {
 func TestNewConfigProtocol(t *testing.T) {
 	// expect error with empty proto
 	ci := ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
+		target: "mikemilano/seeder",
 		src:   "./",
 		dst:   "./",
 		cdir: "/tmp",
@@ -209,7 +142,7 @@ func TestNewConfigProtocol(t *testing.T) {
 
 	// expect error invalid proto
 	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
+		target: "mikemilano/seeder",
 		src:   "./",
 		dst:   "./",
 		cdir: "/tmp",
@@ -222,7 +155,7 @@ func TestNewConfigProtocol(t *testing.T) {
 
 	// expect no error with auto proto
 	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
+		target: "mikemilano/seeder",
 		src:   "./",
 		dst:   "./",
 		cdir: "/tmp",
@@ -235,7 +168,7 @@ func TestNewConfigProtocol(t *testing.T) {
 
 	// expect no error with https proto
 	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
+		target: "mikemilano/seeder",
 		src:   "./",
 		dst:   "./",
 		cdir: "/tmp",
@@ -248,7 +181,7 @@ func TestNewConfigProtocol(t *testing.T) {
 
 	// expect no error with ssh proto
 	ci = ConfigInput{
-		target: "https://github.com/mikemilano/seeder.git",
+		target: "mikemilano/seeder",
 		src:   "./",
 		dst:   "./",
 		cdir: "/tmp",
