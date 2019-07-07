@@ -17,6 +17,19 @@ Multiple paths can be separated by commas; Default: Repo root
 - `dst`: (optional) Destination path where the source should be copied to; Default behavior places source files in the
 same relative paths as they are in the source.
 
+```
+OPTIONS:
+   --branch value, -b value        Git branch
+   --clone-cdir value, -c value    temp directory where repo will be cloned; "memory" to use system memory (default: "/tmp") [/tmp]
+   --ssh-key value, -k value       private ssh key to use (default: "/Users/mmilano/.ssh/id_rsa")
+   --github-proto value, -p value  Github proto; auto, https, or ssh (default: "auto")
+   --preserve-git, -g              preserve .git directory
+   --quiet, -q                     quiet mode, no output
+   --verbose, -v                   verbose mode for troubleshooting
+   --help, -h                      show help
+   --version, -V                   print the version
+```
+
 ## Examples:
 
 Copy the contents of a start state you maintain into your current directory:
