@@ -18,16 +18,6 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "src, s",
-			Usage: "source path to copy from; separate multiple with commas",
-			Value: "./",
-		},
-		cli.StringFlag{
-			Name:  "dst, d",
-			Usage: "destination path to copy to; separate multiple with commas",
-			Value: "./",
-		},
-		cli.StringFlag{
 			Name:  "branch, b",
 			Usage: "Git branch",
 		},
