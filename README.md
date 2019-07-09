@@ -59,31 +59,30 @@ Now I need `.htaccess` and `.editorconfig`:
 gitcp example/my-old-web-project .htaccess,.editorconfig
 ```
 
-... wait, I need `.htaccess` in the `./public` directory:
+... wait, I needed `.htaccess` in the `./public` directory:
 ```bash
 gitcp example/my-old-web-project .htaccess,.editorconfig public/.htaccess,.editorconfig
 ```
 
-I actually want to copy all `.c` files in the project
+I'd like to copy `.c` files recursively beginning with the `src` directory:
 ```bash
 gitcp example/foo src/**/.c
 ```
 
-Wait, I only want `.c` files that are named with alpha characters only:
+And now only want `.c` files that are named with lower case alphanumeric characters:
 ```bash
-gitcp example/foo src/**/[A-z].c
+gitcp example/foo src/**/[a-z0-9].c
 ```
 
-Does the private repo require a special key?
-```bash
-gitcp -k ~/.ssh/mykey.pem example/bar
-```
-
-Not using github? No problem:
+Not using github? Use any git URL:
 ```bash
 gitcp ssh://user@host.xz:port/path/to/repo.git
 ```
 
+This repo requires a key:
+```bash
+gitcp --ssh-key ~/.ssh/mykey.pem ssh://user@host.xz:port/path/to/repo.git
+```
 
 ## More Examples:
 ```
