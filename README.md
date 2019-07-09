@@ -43,26 +43,35 @@ Or, maybe you just want to grab that `.editorconfig` file:
 gitcp example/my-favorite-monolith .editorconfig
 ```
 
-Need to specify a destination?
+Need to specify a different path to the destination?
 ```bash
 gitcp example/some-web-project .htaccess public/.htaccess
 ```
 
-I think I want to retrieve all the `User` components.
+Let's use a wildcard (`*`) to grab all components that begin with `User`:
 ```bash
 # If destination is not specified, it will use the same structure for each file.
 gitcp example/my-vue-project components/User*
 ```
 
-Or, maybe we need a couple files placed in different directories...
+Now I need `.htaccess` and `.editorconfig`:
 ```bash
-# Copies .htaccess to public/.htaccess and .editorconfig to ./.editorconfig
+gitcp example/my-old-web-project .htaccess,.editorconfig
+```
+
+... wait, I need `.htaccess` in the `./public` directory:
+```bash
 gitcp example/my-old-web-project .htaccess,.editorconfig public/.htaccess,.editorconfig
 ```
 
-More globbing!
+I actually want to copy all `.c` files in the project
 ```bash
-gitcp example/foo src/**/*.c
+gitcp example/foo src/**/.c
+```
+
+Wait, I only want `.c` files that are named with alpha characters only:
+```bash
+gitcp example/foo src/**/[A-z].c
 ```
 
 Does the private repo require a special key?
